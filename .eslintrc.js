@@ -13,6 +13,8 @@ module.exports = {
     extends: [
         'plugin:react/recommended',
         'airbnb',
+        'plugin:@typescript-eslint/eslint-recommended',
+        'plugin:@typescript-eslint/recommended',
     ],
 
     // Helps ESLint determine parsing errors
@@ -48,8 +50,11 @@ module.exports = {
     // or can be an array, which will overwrite the rule.
     // Useful TS related rules: https://github.com/benmosher/eslint-plugin-import/issues/1573#issuecomment-566373069
     rules: {
-        'react/jsx-filename-extension': [4, { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
-        'react/jsx-indent': [4, 'tab'],
+        'react/jsx-filename-extension': [2, { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
+        'react/jsx-indent': ['error', 4],
+        'react/jsx-indent-props': ['error', 4],
+        // 'function-paren-newline': ['error', 'never'],
+        indent: ['error', 4],
         'import/extensions': [
             'error',
             'ignorePackages',
@@ -61,7 +66,9 @@ module.exports = {
                 mjs: 'never',
             },
         ],
-        indent: ['error', 4],
+        // disable eslint unused vars rule and enable only the typescript rule
+        'no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': 'error',
     },
 
     // pass specific settings to plugins

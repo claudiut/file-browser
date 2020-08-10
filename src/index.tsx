@@ -1,24 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
 
-import store from './store';
 import App from './app/App';
 
 import './index.scss';
 
-const appDomNode = document.getElementById('app');
+const appDomNode = document.getElementById('file-explorer');
 
-const serverApi = appDomNode && appDomNode.getAttribute('server-api');
+if (appDomNode) {
+    const serverApi = appDomNode.getAttribute('server-api');
 
-ReactDOM.render(
-    <React.StrictMode>
-        {serverApi && (
-            <Provider store={store}>
-                <App serverApi={serverApi} />
-            </Provider>
-        )}
-        {!serverApi && 'Please add "server-api" html attribute to the "#app" element'}
-    </React.StrictMode>,
-    appDomNode,
-);
+    ReactDOM.render(
+        <React.StrictMode>
+            {serverApi && <App serverApi={serverApi} />}
+            {!serverApi && 'Please add "server-host" html attribute to the "#app" element'}
+        </React.StrictMode>,
+        appDomNode,
+    );
+}

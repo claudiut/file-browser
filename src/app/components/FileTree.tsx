@@ -1,88 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
-import axios from 'axios';
-import sortBy from 'lodash/sortBy';
+import React, { useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
+import qs from 'qs';
 
-import { Files } from '../types/File';
+import Directory from '../types/Directory';
 import FileList, { OpenFileCallback } from './FileList';
-import { getFilename } from '../helpers/file';
-
-import { ServerApi } from '../types/props';
+import useRemoteFiles from '../hooks/useRemoteFiles';
 
 import './FileTree.scss';
+import { Files } from '../types/File';
+import useSelectFilesBasedOnPath from '../hooks/usePathToSelectedFiles';
 
 interface FileTreeProps {
-    serverApi: ServerApi,
-};
-
-interface Directory {
-    files: Files,
-    parentPath: string,
-    depth: number,
-};
+    serverApi: string,
+}
 
 const FileTree = ({ serverApi }: FileTreeProps): JSX.Element => {
-    const { 0: path } = useParams();
+    const [selectedFiles, setSelectedFiles] = useState<Files>([]);
+
     const history = useHistory();
+    const { search } = useLocation();
+    const { path = '/' } = qs.parse(search.slice(1));
 
-    const [selectedFilePaths, setSelectedFilePaths] = useState<Array<string>>([]);
-    const [directories, setDirectories] = useState<Array<Directory>>([]);
+    const [error, directories] = useRemoteFiles(`${serverApi}${path}`, selectedFiles.slice(-1)[0]);
 
-    useEffect(() => {
-        const fetchFiles = () => {
-            const CancelToken = axios.CancelToken;
-            const source = CancelToken.source();
-
-            const requestPath = `${serverApi as string}${path}`;
-
-            // request directory data
-            axios.get(requestPath, { cancelToken: source.token })
-                .then(({ data }: { data: Array<Directory> }) => {
-                    const dirs = data.map((dir): Directory => ({
-                        ...dir,
-                        files: sortBy(dir.files, ({ path }) => getFilename(path).toLowerCase())
-                    }));
-                    setDirectories(dirs);
-                })
-                .catch((err) => {
-                    console.log(`Error for ${requestPath}`, err);
-                })
-
-            return source;
-        };
-
-        const { cancel } = fetchFiles();
-
-        return cancel;
-    }, [serverApi, path]);
-
-    useEffect(() => {
-        const parts = path.slice(1).split('/');
-        const selectedFilePaths = parts.map((_: string, i: number) => `/${parts.slice(0, i + 1).join('/')}`);
-        setSelectedFilePaths(selectedFilePaths);
-    }, [path]);
+    useSelectFilesBasedOnPath(directories, path as string, setSelectedFiles);
 
     const handleOpenFile: OpenFileCallback = (selectedFile) => {
-        setSelectedFilePaths((paths: Array<string>) => (
-            paths.includes(selectedFile.path)
-                ? paths
-                : [...paths, selectedFile.path]
+        // we save the selected files' paths into state so that the UI is behaving optimistically
+        setSelectedFiles((files: Files) => (
+            files.includes(selectedFile) ? selectedFiles : [...selectedFiles, selectedFile]
         ));
-        history.push(selectedFile.path);
+        history.push(`?${qs.stringify({ path: selectedFile.path })}`);
+    };
+
+    if (error) {
+        return (
+            <div>
+                An error has occured while fetching the files:
+                {' '}
+                {error.message}
+            </div>
+        );
     }
 
     return (
         <div id="file-tree" className="flex h-100">
-            {directories.map(({ files, parentPath, depth }: Directory) => (
+            {directories.map(({ files, parentPath }: Directory) => (
                 <FileList
                     className="h-100 w-100 overflow-y-auto"
                     key={parentPath}
                     files={files}
                     openFile={handleOpenFile}
-                    selectedFilePaths={selectedFilePaths}
+                    selectedFiles={selectedFiles}
                 />
-            )
-            )}
+            ))}
         </div>
     );
 };

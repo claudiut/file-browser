@@ -1,4 +1,4 @@
-export interface File {
+export type File = {
     path: string,
     isDir: boolean,
     parent: string,
