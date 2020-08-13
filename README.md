@@ -1,7 +1,7 @@
 ### File Explorer (in progress)
 
 ## Stack
-Built with React, TypeScript, Webpack & Eslint
+Built with React, TypeScript and Webpack.
 
 ## TODO
 - add file fetch (preview) functionality
