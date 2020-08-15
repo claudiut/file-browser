@@ -9,7 +9,7 @@ Built with React, Redux, TypeScript, Webpack & Eslint
 - add file fetch (preview) functionality
 - create/delete/rename directories
 - add upload file functionality
-- add permissions (at least for root dirs)
+- maybe add permissions (at least for root dirs)
 
 ## Licence
 MIT
