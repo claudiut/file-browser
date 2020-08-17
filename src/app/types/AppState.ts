@@ -1,11 +1,10 @@
 import Directory from './Directory';
-import FetchStatus from '../enums/FetchStatus';
 import { Files } from './File';
 
 export type FilesState = {
     data: Array<Directory>,
     selected: Files,
-    fetchStatus: FetchStatus,
+    currentlyFetching: string | null,
     fetchError: Error | null,
     initialized: boolean,
 };

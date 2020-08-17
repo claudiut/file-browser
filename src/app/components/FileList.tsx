@@ -1,47 +1,20 @@
 import React from 'react';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
 
-import { File, Files } from '../types/File';
-import FileIcon from './FileIcon';
-import { getFilename } from '../helpers/file';
-
-export type OpenFileCallback = (file: File) => void;
+import { File } from '../types/File';
+import FileListItem from './FileListItem';
 
 interface FileListProps {
     files: Array<File>,
-    openFile: OpenFileCallback,
-    selectedFiles: Files,
     className?: string,
 }
 
 const FileList = ({
     files,
-    openFile,
-    selectedFiles,
     className,
 }: FileListProps): JSX.Element => (
     <List className={`file-list ${className}`}>
-        {files.map((file: File) => {
-            const selected = selectedFiles.some(({ path }) => path === file.path);
-
-            return (
-                <ListItem
-                    button
-                    selected={selected}
-                    className="file-list__item"
-                    key={file.path}
-                    onClick={() => openFile(file)}
-                >
-                    <ListItemIcon>
-                        <FileIcon file={file} isOpen={selected} />
-                    </ListItemIcon>
-                    <ListItemText primary={getFilename(file.path)} />
-                </ListItem>
-            );
-        })}
+        {files.map((file: File) => <FileListItem key={file.path} file={file} />)}
     </List>
 );
 

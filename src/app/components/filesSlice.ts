@@ -5,7 +5,6 @@ import qs from 'qs';
 
 import { getFilename } from '../helpers/file';
 import Directory from '../types/Directory';
-import FetchStatus from '../enums/FetchStatus';
 import AppState, { FilesState } from '../types/AppState';
 import { File, Files } from '../types/File';
 import QsParsedValue from '../types/QsParsedValue';
@@ -32,6 +31,7 @@ export const fetchDirectory = createAsyncThunk(
         const queryString = qs.stringify(queryParams);
 
         const { data } = await axios.get(`${fetchUrl}?${queryString}`, { cancelToken: source.token });
+
         return data;
     },
 );
@@ -46,12 +46,12 @@ const filesSlice = createSlice({
     initialState: <FilesState>{
         data: [],
         selected: [],
-        fetchStatus: FetchStatus.pending,
+        currentlyFetching: null,
         fetchError: null,
         initialized: false,
     },
     reducers: {
-        setSelected: (state, { payload: { path: currentPath, directories } }) => {
+        setSelectedByPath: (state, { payload: { path: currentPath, directories } }) => {
             const parts = currentPath.slice(1).split('/');
             const selectedPaths = parts.map((_: string, i: number) => `/${parts.slice(0, i + 1).join('/')}`);
 
@@ -68,18 +68,23 @@ const filesSlice = createSlice({
             // eslint-disable-next-line no-param-reassign
             state.selected = selectedFiles;
         },
+        selectFile: (state, { payload }: { payload: File }) => {
+            // eslint-disable-next-line no-param-reassign
+            // state.selected = state.selected.slice(0, payload.depth);
+            state.selected.push(payload);
+        },
     },
     extraReducers: {
-        [fetchDirectory.pending.toString()]: (state) => {
+        [fetchDirectory.pending.toString()]: (state, { meta: { arg: { path } } }) => {
             // eslint-disable-next-line no-param-reassign
-            state.fetchStatus = FetchStatus.pending;
+            state.currentlyFetching = path;
         },
         [fetchDirectory.fulfilled.toString()]: (state, action) => {
             // eslint-disable-next-line no-param-reassign
             state.initialized = true;
 
             // eslint-disable-next-line no-param-reassign
-            state.fetchStatus = FetchStatus.success;
+            state.currentlyFetching = null;
 
             if (Array.isArray(action.payload)) {
                 // eslint-disable-next-line no-param-reassign
@@ -97,7 +102,7 @@ const filesSlice = createSlice({
         },
         [fetchDirectory.rejected.toString()]: (state, { payload }) => {
             // eslint-disable-next-line no-param-reassign
-            state.fetchStatus = FetchStatus.failed;
+            state.currentlyFetching = null;
             // eslint-disable-next-line no-param-reassign
             state.fetchError = payload;
         },
@@ -106,12 +111,17 @@ const filesSlice = createSlice({
 
 export default filesSlice.reducer;
 
-export const { setSelected } = filesSlice.actions;
+export const { setSelectedByPath, selectFile } = filesSlice.actions;
 
 export const selectDirectories = (state: AppState): Array<Directory> => state.files.data;
 
 export const selectSelectedFiles = (state: AppState): Files => state.files.selected;
 
-export const selectFetchStatus = (state: AppState): FetchStatus => state.files.fetchStatus;
+export const isCurrenlyFetching = (file: File) => (
+    (state: AppState): boolean => state.files.currentlyFetching === file.path
+);
 
+export const isFileSelected = (file: File) => (state: AppState): boolean => (
+    state.files.selected.some((selectedFile: File) => selectedFile.path === file.path)
+);
 export const selectFetchError = (state: AppState): Error | null => state.files.fetchError;
