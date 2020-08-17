@@ -1,24 +1,40 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import sortBy from 'lodash/sortBy';
+import qs from 'qs';
 
 import { getFilename } from '../helpers/file';
 import Directory from '../types/Directory';
 import FetchStatus from '../enums/FetchStatus';
 import AppState, { FilesState } from '../types/AppState';
 import { File, Files } from '../types/File';
+import QsParsedValue from '../types/QsParsedValue';
+
+type FetchDirectoryParams = { fetchUrl: string, path: QsParsedValue };
 
 // async action for fetching remote files
-export const fetchDirectory = createAsyncThunk('files/fetchDirectory', async (fetchUrl: string, thunkAPI: { signal: AbortSignal }) => {
-    const { CancelToken } = axios;
-    const source = CancelToken.source();
-    thunkAPI.signal.addEventListener('abort', () => {
-        source.cancel();
-    });
+export const fetchDirectory = createAsyncThunk(
+    'files/fetchDirectory',
+    async (
+        { fetchUrl, path }: FetchDirectoryParams,
+        thunkAPI: { signal: AbortSignal, getState: () => unknown },
+    ) => {
+        const { CancelToken } = axios;
+        const source = CancelToken.source();
+        thunkAPI.signal.addEventListener('abort', () => {
+            source.cancel();
+        });
 
-    const { data } = await axios.get(fetchUrl, { cancelToken: source.token });
-    return data;
-});
+        const queryParams = { path, withParents: false };
+        if (!(thunkAPI.getState() as AppState).files.initialized) {
+            queryParams.withParents = true;
+        }
+        const queryString = qs.stringify(queryParams);
+
+        const { data } = await axios.get(`${fetchUrl}?${queryString}`, { cancelToken: source.token });
+        return data;
+    },
+);
 
 const alphaSortFilesOfDir = (dir: Directory): Directory => ({
     ...dir,
@@ -28,18 +44,27 @@ const alphaSortFilesOfDir = (dir: Directory): Directory => ({
 const filesSlice = createSlice({
     name: 'files',
     initialState: <FilesState>{
-        data: [], selected: [], fetchStatus: FetchStatus.pending, fetchError: null,
+        data: [],
+        selected: [],
+        fetchStatus: FetchStatus.pending,
+        fetchError: null,
+        initialized: false,
     },
     reducers: {
-        setSelected: (state, { payload: currentPath }) => {
+        setSelected: (state, { payload: { path: currentPath, directories } }) => {
             const parts = currentPath.slice(1).split('/');
             const selectedPaths = parts.map((_: string, i: number) => `/${parts.slice(0, i + 1).join('/')}`);
 
-            const selectedFiles = <Files>state.data
-                .map(({ files }) => (
+            if (!directories.length) {
+                return;
+            }
+
+            const selectedFiles = directories
+                .map(({ files }: { files: Files }) => (
                     files.find((file) => selectedPaths.includes(file.path))
                 ))
                 .filter((file: File | undefined) => file);
+
             // eslint-disable-next-line no-param-reassign
             state.selected = selectedFiles;
         },
@@ -50,6 +75,9 @@ const filesSlice = createSlice({
             state.fetchStatus = FetchStatus.pending;
         },
         [fetchDirectory.fulfilled.toString()]: (state, action) => {
+            // eslint-disable-next-line no-param-reassign
+            state.initialized = true;
+
             // eslint-disable-next-line no-param-reassign
             state.fetchStatus = FetchStatus.success;
 

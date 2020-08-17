@@ -25,7 +25,7 @@ const FileList = ({
 }: FileListProps): JSX.Element => (
     <List className={`file-list ${className}`}>
         {files.map((file: File) => {
-            const selected = selectedFiles.includes(file);
+            const selected = selectedFiles.some(({ path }) => path === file.path);
 
             return (
                 <ListItem

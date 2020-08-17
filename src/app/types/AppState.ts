@@ -7,6 +7,7 @@ export type FilesState = {
     selected: Files,
     fetchStatus: FetchStatus,
     fetchError: Error | null,
+    initialized: boolean,
 };
 
 type AppState = {

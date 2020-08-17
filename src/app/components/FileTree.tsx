@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import qs from 'qs';
+import { isEqual } from 'lodash';
 
 import Directory from '../types/Directory';
 import FileList, { OpenFileCallback } from './FileList';
@@ -15,34 +16,34 @@ import {
     selectSelectedFiles,
 } from './filesSlice';
 import AppDispatch from '../types/AppDispatch';
+import usePrevious from '../hooks/usePrevious';
 
 type FileTreeProps = {
     serverApi: string,
 }
 
-const FileTree = ({ serverApi }: FileTreeProps): JSX.Element => {
+const FileTree = ({ serverApi }: FileTreeProps): JSX.Element | null => {
     const history = useHistory();
     const { search } = useLocation();
     const { path = '/' } = qs.parse(search.slice(1));
 
     const directories = useSelector(selectDirectories);
+    const prevDirectories = usePrevious(directories);
     const selectedFiles = useSelector(selectSelectedFiles);
     const fetchError = useSelector(selectFetchError);
 
     const dispatch: AppDispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(setSelected(path));
-        const queryParams = qs.stringify({ path });
-        const fetchDirectoryPromise = dispatch(fetchDirectory(`${serverApi}/files?${queryParams}`));
-        return () => { fetchDirectoryPromise.abort(); };
+        const fetchPromise = dispatch(fetchDirectory({ fetchUrl: `${serverApi}/files`, path }));
+        return () => { fetchPromise.abort(); };
     }, [path]);
 
     useEffect(() => {
-        const queryParams = qs.stringify({ path, withParents: true });
-        const fetchDirectoryPromise = dispatch(fetchDirectory(`${serverApi}/files?${queryParams}`));
-        return () => { fetchDirectoryPromise.abort(); };
-    }, []);
+        if (!isEqual(directories, prevDirectories)) {
+            dispatch(setSelected({ path, directories }));
+        }
+    }, [path, directories]);
 
     const handleOpenFile: OpenFileCallback = (selectedFile) => {
         history.push(`?${qs.stringify({ path: selectedFile.path })}`);
