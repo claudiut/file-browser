@@ -1,8 +1,8 @@
 import { useRef, useEffect } from 'react';
 import Directory from '../types/Directory';
-import { Files } from '../types/File';
+import QsParsedValue from '../types/QsParsedValue';
 
-type Value = number | string | Array<Directory> | Files | undefined;
+type Value = Array<Directory> | QsParsedValue;
 
 const usePrevious = (value: Value): Value => {
     const ref = useRef() as React.MutableRefObject<Value>;

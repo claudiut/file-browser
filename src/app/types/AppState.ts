@@ -4,9 +4,8 @@ import { Files } from './File';
 export type FilesState = {
     data: Array<Directory>,
     selected: Files,
-    currentlyFetching: string | null,
+    currentlyFetchingPath: string | null,
     fetchError: Error | null,
-    initialized: boolean,
 };
 
 type AppState = {

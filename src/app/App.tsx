@@ -5,15 +5,11 @@ import FileTree from './components/FileTree';
 
 import './App.scss';
 
-interface AppProps {
-    serverApi: string,
-}
-
-const App = ({ serverApi }: AppProps): JSX.Element => (
+const App = (): JSX.Element => (
     <BrowserRouter>
         <Switch>
             <Route path="*">
-                <FileTree serverApi={serverApi} />
+                <FileTree />
             </Route>
         </Switch>
     </BrowserRouter>

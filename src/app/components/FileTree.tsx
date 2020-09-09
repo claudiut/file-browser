@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import qs from 'qs';
-import { isEqual } from 'lodash';
 
 import Directory from '../types/Directory';
 import FileList from './FileList';
@@ -13,44 +12,71 @@ import {
     setSelectedByPath,
     selectDirectories,
     selectFetchError,
+    selectCurrentlyFetchingPath,
+    selectSelectedFile,
 } from './filesSlice';
 import AppDispatch from '../types/AppDispatch';
-import usePrevious from '../hooks/usePrevious';
+import { getParentPath } from '../helpers/file';
+import { RootOptions } from '../contexts';
+import FilePreview from './FilePreview';
 
-type FileTreeProps = {
-    serverApi: string,
-}
-
-const FileTree = ({ serverApi }: FileTreeProps): JSX.Element | null => {
+const FileTree = (): JSX.Element | null => {
     const { search } = useLocation();
-    const { path = '/' } = qs.parse(search.slice(1));
+    // don't use the path as the source of truth but use the redux state
+    const { path: qsPath = '/' } = qs.parse(search.slice(1));
+    const path = qsPath as string;
 
     const directories = useSelector(selectDirectories);
-    const prevDirectories = usePrevious(directories);
+    const selectedFile = useSelector(selectSelectedFile);
     const fetchError = useSelector(selectFetchError);
+    const currentlyFetchingPath = useSelector(selectCurrentlyFetchingPath);
+    const { serverApi } = useContext(RootOptions);
 
     const dispatch: AppDispatch = useDispatch();
 
     useEffect(() => {
-        const fetchPromise = dispatch(fetchDirectory({ fetchUrl: `${serverApi}/files`, path }));
-        return () => { fetchPromise.abort(); };
-    }, [path]);
+        const fetchAndSelectDirs = async () => {
+            const actionTaken = await dispatch(fetchDirectory({ fetchUrl: serverApi, path, withParents: true }));
+            if (actionTaken.type === fetchDirectory.fulfilled.toString()) {
+                dispatch(setSelectedByPath({ path, directories: actionTaken.payload }));
+            }
+        };
 
-    useEffect(() => {
-        if (!isEqual(directories, prevDirectories)) {
-            dispatch(setSelectedByPath({ path, directories }));
-        }
-    }, [path, directories]);
+        fetchAndSelectDirs();
+    }, []);
+
+    const listContainerClasses = 'h-100 w-100 overflow-y-auto bn';
+
+    const isLoadingDir = selectedFile && selectedFile.isDir && currentlyFetchingPath;
+    let parentOfLoadingDir;
+    if (isLoadingDir) {
+        const parentOfLoadingPath = getParentPath(currentlyFetchingPath as string);
+        parentOfLoadingDir = directories.find(
+            ({ parentPath }) => parentPath === parentOfLoadingPath,
+        );
+    }
+    const dirsToRender = isLoadingDir && parentOfLoadingDir
+        ? directories.slice(0, parentOfLoadingDir.depth + 1)
+        : directories;
 
     return (
         <div id="file-tree" className="flex h-100">
-            {directories.map(({ files, parentPath }: Directory) => (
+            {dirsToRender.map(({ files, parentPath }: Directory) => (
                 <FileList
-                    className="h-100 w-100 overflow-y-auto"
+                    className={listContainerClasses}
                     key={parentPath}
                     files={files}
                 />
             ))}
+
+            {isLoadingDir && <div className={listContainerClasses} />}
+
+            {selectedFile && !selectedFile.isDir && (
+                <div className={listContainerClasses}>
+                    <FilePreview file={selectedFile} />
+                </div>
+            )}
+
             {fetchError && <div className="h-100 w-100">{fetchError.message}</div>}
         </div>
     );
