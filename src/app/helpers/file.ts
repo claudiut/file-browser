@@ -12,9 +12,9 @@ export const getSelectedFile = (files: Files, path: string): File | undefined =>
     files.find((file: File) => file.path === path || path.indexOf(`${file.path}/`) === 0)
 );
 
-export const getParentPath = (path: string): string => {
+export const getParentPath = (path: string): string | null => {
     const parts = path.split('/');
-    return parts.slice(0, -1).join('/') || '/';
+    return parts.slice(0, -1).join('/') || null;
 };
 
 export const alphaSortFilesOfDir = (dir: Directory): Directory => ({
@@ -26,4 +26,11 @@ export const getDirectoryOfFile = (file: File, directories: Array<Directory>): D
         <Directory>directories.find(
             ({ files }) => files.some(({ path }) => path === file.path),
         )
+);
+
+export const removeFrontDirectories = (
+    (file: File, directories: Array<Directory>): Array<Directory> => {
+        const fileDir = getDirectoryOfFile(file, directories);
+        return directories.slice(0, fileDir.depth + 1);
+    }
 );

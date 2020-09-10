@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import qs from 'qs';
@@ -6,7 +7,9 @@ import Directory from '../types/Directory';
 import AppState, { FilesState } from '../types/AppState';
 import { File, Files } from '../types/File';
 import QsParsedValue from '../types/QsParsedValue';
-import { alphaSortFilesOfDir, getDirectoryOfFile } from '../helpers/file';
+import {
+    alphaSortFilesOfDir, getDirectoryOfFile, removeFrontDirectories,
+} from '../helpers/file';
 
 type FetchDirectoryParams = { fetchUrl: string, path: QsParsedValue, withParents?: boolean };
 
@@ -35,7 +38,7 @@ const filesSlice = createSlice({
     initialState: <FilesState>{
         data: [],
         selected: [],
-        currentlyFetchingPath: null,
+        isFetching: false,
         fetchError: null,
     },
     reducers: {
@@ -54,34 +57,25 @@ const filesSlice = createSlice({
                 ))
                 .filter((file: File | undefined) => file);
 
-            // eslint-disable-next-line no-param-reassign
             state.selected = selectedFiles;
         },
 
         // remove selection of files with gte depth and add the newly selected one
         addSelected: (state, { payload: { file } }) => {
             const fileDir = getDirectoryOfFile(file, state.data);
-            // eslint-disable-next-line no-param-reassign
             state.selected = state.selected.slice(0, fileDir.depth).concat([file]);
-        },
 
-        removeFrontDirectories: (state, { payload: { file } }) => {
-            const fileDir = getDirectoryOfFile(file, state.data);
-            // eslint-disable-next-line no-param-reassign
-            state.data = state.data.slice(0, fileDir.depth + 1);
+            state.data = removeFrontDirectories(file, state.data);
         },
     },
     extraReducers: {
-        [fetchDirectory.pending.toString()]: (state, { meta: { arg: { path } } }) => {
-            // eslint-disable-next-line no-param-reassign
-            state.currentlyFetchingPath = path;
+        [fetchDirectory.pending.toString()]: (state) => {
+            state.isFetching = true;
         },
         [fetchDirectory.fulfilled.toString()]: (state, action) => {
-            // eslint-disable-next-line no-param-reassign
-            state.currentlyFetchingPath = null;
+            state.isFetching = false;
 
             if (Array.isArray(action.payload)) {
-                // eslint-disable-next-line no-param-reassign
                 state.data = action.payload.map(alphaSortFilesOfDir);
                 return;
             }
@@ -89,15 +83,11 @@ const filesSlice = createSlice({
             const directory = alphaSortFilesOfDir(action.payload);
 
             // remove the unnecessary dirs when we chose a parent dir
-            // eslint-disable-next-line no-param-reassign
             state.data = state.data.slice(0, directory.depth);
-            // eslint-disable-next-line no-param-reassign
             state.data.push(directory);
         },
         [fetchDirectory.rejected.toString()]: (state, { payload }) => {
-            // eslint-disable-next-line no-param-reassign
-            state.currentlyFetchingPath = null;
-            // eslint-disable-next-line no-param-reassign
+            state.isFetching = false;
             state.fetchError = payload;
         },
     },
@@ -105,7 +95,7 @@ const filesSlice = createSlice({
 
 export default filesSlice.reducer;
 
-export const { setSelectedByPath, addSelected, removeFrontDirectories } = filesSlice.actions;
+export const { setSelectedByPath, addSelected } = filesSlice.actions;
 
 export const selectDirectories = (state: AppState): Array<Directory> => state.files.data;
 
@@ -117,6 +107,7 @@ export const selectSelectedFile = (state: AppState): File | null => (
     state.files.selected[state.files.selected.length - 1] || null
 );
 export const selectFetchError = (state: AppState): Error | null => state.files.fetchError;
-export const selectCurrentlyFetchingPath = (
-    (state: AppState): string | null => state.files.currentlyFetchingPath
+
+export const selectIsFetching = (
+    (state: AppState): boolean => state.files.isFetching
 );

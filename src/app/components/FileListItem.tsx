@@ -10,7 +10,7 @@ import { File } from '../types/File';
 import FileIcon from './FileIcon';
 import { getFilename } from '../helpers/file';
 import {
-    isFileSelected, fetchDirectory, addSelected, removeFrontDirectories,
+    isFileSelected, fetchDirectory, addSelected,
 } from './filesSlice';
 import { RootOptions } from '../contexts';
 
@@ -34,11 +34,8 @@ const FileListItem = ({ file }: FileListItemProps): JSX.Element => {
             key={file.path}
             onClick={() => {
                 dispatch(addSelected({ file }));
-
                 if (file.isDir) {
                     dispatch(fetchDirectory({ fetchUrl: serverApi, path: file.path }));
-                } else {
-                    dispatch(removeFrontDirectories({ file }));
                 }
 
                 history.push(`?${qs.stringify({ path: file.path })}`);
