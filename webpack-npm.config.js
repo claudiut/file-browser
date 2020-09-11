@@ -7,7 +7,7 @@ const commonConfig = require('./webpack-common.config');
 module.exports = merge(commonConfig, {
     output: {
         path: path.join(__dirname, 'npm-build'),
-        filename: 'main.js',
+        filename: 'build.js',
         libraryTarget: 'commonjs2',
     },
 });

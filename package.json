@@ -1,8 +1,8 @@
 {
-    "name": "file-manager-with-permissions",
+    "name": "file-manager",
     "version": "0.5.0",
     "description": "",
-    "main": "npm-build/main.js",
+    "main": "npm-build/build.js",
     "scripts": {
         "start": "webpack-dev-server --config webpack-local.config.js",
         "build": "webpack --mode production --config webpack-npm.config.js"
