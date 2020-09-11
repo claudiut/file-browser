@@ -1,7 +1,5 @@
-const path = require('path');
-// NOTE: be sure to install @types/html-webpack-plugin or we will get TS errors
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const path = require('path');
 
 module.exports = {
     mode: 'development',
@@ -51,11 +49,6 @@ module.exports = {
         ],
     },
     plugins: [
-        // take a html file and injects the output JS file in it
-        new HtmlWebpackPlugin({
-            template: './src/template.html',
-            favicon: './src/assets/images/favicon.png',
-        }),
         new CleanWebpackPlugin(),
     ],
     // configures how webpack resolves modules
