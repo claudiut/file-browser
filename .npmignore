@@ -3,4 +3,6 @@ src
 .eslint.js
 .gitignore
 .tsconfig.json
-webpack.config.js
+webpack-common.config.js
+webpack-local.config.js
+webpack-npm.config.js
