@@ -8,7 +8,7 @@ import qs from 'qs';
 
 import { File } from '../types/File';
 import FileIcon from './FileIcon';
-import { getFilename } from '../helpers/file';
+import { getFilename, getDirectoryApiPath } from '../helpers/file';
 import {
     isFileSelected, fetchDirectory, addSelected,
 } from './filesSlice';
@@ -35,7 +35,12 @@ const FileListItem = ({ file }: FileListItemProps): JSX.Element => {
             onClick={() => {
                 dispatch(addSelected({ file }));
                 if (file.isDir) {
-                    dispatch(fetchDirectory({ fetchUrl: serverApi, path: file.path }));
+                    dispatch(
+                        fetchDirectory({
+                            fetchUrl: getDirectoryApiPath(serverApi),
+                            path: file.path,
+                        }),
+                    );
                 }
 
                 history.push(`?${qs.stringify({ path: file.path })}`);

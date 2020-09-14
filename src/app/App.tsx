@@ -7,19 +7,15 @@ import { RootOptions } from './contexts';
 
 import './App.scss';
 
-type AppPropsType = {serverApi: string|null};
+type AppPropsType = {serverApi: string};
 
 const App = ({ serverApi }: AppPropsType): JSX.Element => (
     <React.StrictMode>
-        {serverApi
-            ? (
-                <Provider store={store}>
-                    <RootOptions.Provider value={{ serverApi }}>
-                        <Router />
-                    </RootOptions.Provider>
-                </Provider>
-            )
-            : 'Please add "server-host" html attribute to the "#app" element'}
+        <Provider store={store}>
+            <RootOptions.Provider value={{ serverApi }}>
+                <Router />
+            </RootOptions.Provider>
+        </Provider>
     </React.StrictMode>
 );
 

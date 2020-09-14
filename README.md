@@ -7,9 +7,8 @@ Browse your files using File Manager!
 Built with React, Redux, TypeScript, Webpack & Eslint
 
 ## TODO
-- create/delete/rename directories
+- delete/rename directories
 - add upload file functionality
-- refactor API urls to use REST-style
 - maybe add permissions (at least for root dirs)
 
 ## Licence

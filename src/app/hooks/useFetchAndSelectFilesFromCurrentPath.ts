@@ -7,19 +7,22 @@ import AppDispatch from '../types/AppDispatch';
 import { fetchDirectory, setSelectedByPath, selectDirectories } from '../components/filesSlice';
 import { RootOptions } from '../contexts';
 import Directory from '../types/Directory';
+import { getDirectoryApiPath } from '../helpers/file';
 
 const useFetchAndSelectFilesFromCurrentPath = (): Array<Directory> => {
-    const { search } = useLocation();
-    // don't use the path as the source of truth but use the redux state
-    const path = (qs.parse(search.slice(1)).path || '/') as string;
-
-    const { serverApi } = useContext(RootOptions);
     const dispatch: AppDispatch = useDispatch();
+    const { serverApi } = useContext(RootOptions);
+    const { search } = useLocation();
 
     useEffect(() => {
         const fetchAndSelectDirs = async () => {
+            // don't use the path as the source of truth but use the redux state
+            const path = (qs.parse(search.slice(1)).path || '/') as string;
+
             const actionTaken = await dispatch(
-                fetchDirectory({ fetchUrl: serverApi, path, withParents: true }),
+                fetchDirectory({
+                    fetchUrl: getDirectoryApiPath(serverApi), path, withParents: true,
+                }),
             );
             if (actionTaken.type === fetchDirectory.fulfilled.toString()) {
                 dispatch(setSelectedByPath({ path, directories: actionTaken.payload }));

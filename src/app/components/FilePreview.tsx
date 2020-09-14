@@ -3,7 +3,7 @@ import qs from 'qs';
 
 import { File } from '../types/File';
 import { RootOptions } from '../contexts';
-import { getFilename } from '../helpers/file';
+import { getFilename, getFileApiPath } from '../helpers/file';
 
 type FilePreviewPropTypes = { file: File };
 
@@ -11,7 +11,7 @@ const FilePreview = ({ file }: FilePreviewPropTypes): JSX.Element => {
     const { serverApi } = useContext(RootOptions);
 
     const imageType = file.mimeType ? file.mimeType.split('/')[0] : null;
-    const serverFilePath = `${serverApi}?${qs.stringify({ path: file.path })}`;
+    const serverFilePath = `${getFileApiPath(serverApi)}?${qs.stringify({ path: file.path })}`;
 
     let PreviewElement = null;
     if (imageType === 'image') {
@@ -28,6 +28,7 @@ const FilePreview = ({ file }: FilePreviewPropTypes): JSX.Element => {
             <iframe
                 title="File preview"
                 src={serverFilePath}
+                className="bn"
             />
         );
     }

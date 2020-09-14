@@ -1,11 +1,11 @@
 /// <reference types="react" />
-import { File } from '../types/File';
+import Directory from '../types/Directory';
 interface FileListProps {
-    files: Array<File>;
+    directory: Directory;
     className?: string;
 }
 declare const FileList: {
-    ({ files, className, }: FileListProps): JSX.Element;
+    ({ directory: { files, parentPath }, className, }: FileListProps): JSX.Element;
     defaultProps: {
         className: undefined;
     };

@@ -11,7 +11,12 @@ import {
     alphaSortFilesOfDir, getDirectoryOfFile, removeFrontDirectories,
 } from '../helpers/file';
 
-type FetchDirectoryParams = { fetchUrl: string, path: QsParsedValue, withParents?: boolean };
+type FetchDirectoryParams = {
+    fetchUrl: string,
+    path: QsParsedValue,
+    withParents?: boolean,
+    showFetching?: boolean,
+};
 
 // async action for fetching remote files
 export const fetchDirectory = createAsyncThunk(
@@ -67,10 +72,19 @@ const filesSlice = createSlice({
 
             state.data = removeFrontDirectories(file, state.data);
         },
+
+        removeLastSelected: (state) => {
+            state.selected = state.selected.slice(0, -1);
+        },
     },
     extraReducers: {
-        [fetchDirectory.pending.toString()]: (state) => {
-            state.isFetching = true;
+        [fetchDirectory.pending.toString()]: (
+            state,
+            { meta: { arg: { showFetching = true } } },
+        ) => {
+            if (showFetching) {
+                state.isFetching = true;
+            }
         },
         [fetchDirectory.fulfilled.toString()]: (state, action) => {
             state.isFetching = false;
@@ -95,7 +109,7 @@ const filesSlice = createSlice({
 
 export default filesSlice.reducer;
 
-export const { setSelectedByPath, addSelected } = filesSlice.actions;
+export const { setSelectedByPath, addSelected, removeLastSelected } = filesSlice.actions;
 
 export const selectDirectories = (state: AppState): Array<Directory> => state.files.data;
 

@@ -19,17 +19,13 @@ const FileTree = (): JSX.Element | null => {
     const isFetching = useSelector(selectIsFetching);
     const fetchError = useSelector(selectFetchError);
 
-    const isFetchingDir = selectedFile && selectedFile.isDir && isFetching;
-    const listContainerClasses = 'h-100 w-100 overflow-y-auto bn';
+    const isFetchingDir = isFetching && (!selectedFile || selectedFile.isDir);
+    const listContainerClasses = 'h-100 w-100 overflow-y-auto';
 
     return (
         <div id="file-tree" className="flex h-100">
-            {directories.map(({ files, parentPath }: Directory) => (
-                <FileList
-                    className={listContainerClasses}
-                    key={parentPath}
-                    files={files}
-                />
+            {directories.map((dir: Directory) => (
+                <FileList className={listContainerClasses} key={dir.parentPath} directory={dir} />
             ))}
 
             {

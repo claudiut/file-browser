@@ -34,3 +34,7 @@ export const removeFrontDirectories = (
         return directories.slice(0, fileDir.depth + 1);
     }
 );
+
+export const getDirectoryApiPath = (host: string): string => `${host}/directories`;
+
+export const getFileApiPath = (host: string): string => `${host}/files`;
