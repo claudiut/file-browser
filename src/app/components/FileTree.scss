@@ -1,20 +1,30 @@
 .file-list {
     border-right: 1px solid #cacaca;
+
+    &__item-container {
+        .actions {
+            visibility: hidden;
+        }
+
+        &:hover .actions {
+            visibility: visible;
+        }
+    }
 }
 
 .file-preview {
-        img {
-            max-width: 100%;
-        }
-
-        audio,
-        video {
-            width: 100%;
-        }
-
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
+    img {
+        max-width: 100%;
     }
+
+    audio,
+    video {
+        width: 100%;
+    }
+
+    iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+}

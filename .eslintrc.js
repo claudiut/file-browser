@@ -69,6 +69,7 @@ module.exports = {
         // disable eslint unused vars rule and enable only the typescript rule
         'no-unused-vars': 'off',
         '@typescript-eslint/no-unused-vars': 'error',
+        'no-restricted-syntax': 'off',
     },
 
     // pass specific settings to plugins

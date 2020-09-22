@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, Action } from '@reduxjs/toolkit';
 import axios from 'axios';
 import qs from 'qs';
 
@@ -8,8 +8,16 @@ import AppState, { FilesState } from '../types/AppState';
 import { File, Files } from '../types/File';
 import QsParsedValue from '../types/QsParsedValue';
 import {
-    alphaSortFilesOfDir, getDirectoryOfFile, removeFrontDirectories,
+    alphaSortFilesOfDir,
+    getDirectoryApiPath,
+    getDirectoryOfFile,
+    getFileApiPath,
+    removeFrontDirectories,
+    containsFile,
 } from '../helpers/file';
+
+// TODO: reorganize file. Too big.
+// TODO: create
 
 type FetchDirectoryParams = {
     fetchUrl: string,
@@ -17,8 +25,7 @@ type FetchDirectoryParams = {
     withParents?: boolean,
     showFetching?: boolean,
 };
-
-// async action for fetching remote files
+// async action for fetching remote directory
 export const fetchDirectory = createAsyncThunk(
     'files/fetchDirectory',
     async (
@@ -35,6 +42,17 @@ export const fetchDirectory = createAsyncThunk(
         const { data } = await axios.get(`${fetchUrl}?${queryString}`, { cancelToken: source.token });
 
         return data;
+    },
+);
+
+type DeleteFileParams = {file: File, serverApi: string};
+// async action for deleting remote files
+export const deleteFile = createAsyncThunk(
+    'files/delete',
+    async ({ file, serverApi }: DeleteFileParams, { dispatch }) => {
+        const url = file.isDir ? getDirectoryApiPath(serverApi) : getFileApiPath(serverApi);
+        await axios.delete(`${url}?${qs.stringify({ path: file.path })}`);
+        await dispatch(removeDeletedDirectories(file));
     },
 );
 
@@ -76,6 +94,21 @@ const filesSlice = createSlice({
         removeLastSelected: (state) => {
             state.selected = state.selected.slice(0, -1);
         },
+
+        removeDeletedDirectories: (state, { payload: file }: { payload: File }) => {
+            if (containsFile(state.selected, file)) {
+                state.selected = state.selected.filter(({ path }) => path !== file.path);
+
+                const newDirs = [];
+                for (const dir of state.data) {
+                    newDirs.push(dir);
+                    if (containsFile(dir.files, file)) {
+                        break;
+                    }
+                }
+                state.data = newDirs;
+            }
+        },
     },
     extraReducers: {
         [fetchDirectory.pending.toString()]: (
@@ -104,17 +137,31 @@ const filesSlice = createSlice({
             state.isFetching = false;
             state.fetchError = payload;
         },
+
+        [deleteFile.fulfilled.toString()]: (state, { meta: { arg: { file } } }) => {
+            state.data = state.data.map((dir) => ({
+                ...dir,
+                files: dir.files.filter(({ path }) => path !== file.path),
+            }));
+
+            state.selected = state.selected.filter(({ path }) => path !== file.path);
+        },
     },
 });
 
 export default filesSlice.reducer;
 
-export const { setSelectedByPath, addSelected, removeLastSelected } = filesSlice.actions;
+export const {
+    setSelectedByPath,
+    addSelected,
+    removeLastSelected,
+    removeDeletedDirectories,
+} = filesSlice.actions;
 
 export const selectDirectories = (state: AppState): Array<Directory> => state.files.data;
 
 export const isFileSelected = (file: File) => (state: AppState): boolean => (
-    state.files.selected.some((selectedFile: File) => selectedFile.path === file.path)
+    containsFile(state.files.selected, file)
 );
 
 export const selectSelectedFile = (state: AppState): File | null => (

@@ -22,10 +22,12 @@ export const alphaSortFilesOfDir = (dir: Directory): Directory => ({
     files: sortBy(dir.files, ({ path }) => getFilename(path).toLowerCase()),
 });
 
+export const containsFile = (files: Files, file: File): boolean => (
+    files.some(({ path }) => path === file.path)
+);
+
 export const getDirectoryOfFile = (file: File, directories: Array<Directory>): Directory => (
-        <Directory>directories.find(
-            ({ files }) => files.some(({ path }) => path === file.path),
-        )
+        <Directory>directories.find((dir) => containsFile(dir.files, file))
 );
 
 export const removeFrontDirectories = (

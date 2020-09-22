@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { getDirectoryApiPath } from '../helpers/file';
 import { RootOptions } from '../contexts';
-import { fetchDirectory, setSelectedByPath, removeLastSelected } from './filesSlice';
+import { fetchDirectory, setSelectedByPath } from './filesSlice';
 import AppDispatch from '../types/AppDispatch';
 
 type Props = { parentPath: string, onCancel: () => void, onCreated: () => void };

@@ -9,16 +9,18 @@ import { File } from '../types/File';
 const folderStyle = { color: '#CAB869' };
 const fileFontSize = 'small';
 
-const FileIcon = ({ file: { isDir }, isOpen }: { file: File, isOpen: boolean }): JSX.Element => {
+const FileIcon = (
+    { file: { isDir }, isSelected }: { file: File, isSelected: boolean },
+): JSX.Element => {
     if (isDir) {
         return (
-            isOpen
+            isSelected
                 ? <MuiFolderOpenIcon style={folderStyle} />
                 : <MuiFolderIcon style={folderStyle} />
         );
     }
 
-    return isOpen
+    return isSelected
         ? <MuiInsertDriveFileOutlinedIcon fontSize={fileFontSize} />
         : <MuiInsertDriveFileIcon fontSize={fileFontSize} />;
 };

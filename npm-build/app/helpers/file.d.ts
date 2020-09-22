@@ -4,6 +4,7 @@ export declare const getFilename: (path: string) => string;
 export declare const getSelectedFile: (files: Files, path: string) => File | undefined;
 export declare const getParentPath: (path: string) => string | null;
 export declare const alphaSortFilesOfDir: (dir: Directory) => Directory;
+export declare const containsFile: (files: Files, file: File) => boolean;
 export declare const getDirectoryOfFile: (file: File, directories: Array<Directory>) => Directory;
 export declare const removeFrontDirectories: (file: File, directories: Array<Directory>) => Array<Directory>;
 export declare const getDirectoryApiPath: (host: string) => string;
