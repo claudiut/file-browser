@@ -4,10 +4,9 @@ import axios from 'axios';
 import qs from 'qs';
 
 import { useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
 import { getDirectoryApiPath } from '../helpers/file';
 import { RootOptions } from '../contexts';
-import { fetchDirectory, setSelectedByPath } from './filesSlice';
+import { fetchDirectory } from './filesSlice/slice';
 import AppDispatch from '../types/AppDispatch';
 
 type Props = { parentPath: string, onCancel: () => void, onCreated: () => void };
@@ -16,7 +15,6 @@ const DirectoryNew = ({ parentPath, onCreated, onCancel }: Props): JSX.Element =
     const [name, setName] = useState('');
     const { serverApi } = useContext(RootOptions);
     const dispatch: AppDispatch = useDispatch();
-    const history = useHistory();
 
     const handleCreateDirectory = async (event: FormEvent) => {
         event.preventDefault();
@@ -37,17 +35,12 @@ const DirectoryNew = ({ parentPath, onCreated, onCancel }: Props): JSX.Element =
             const actionTaken = await dispatch(
                 fetchDirectory({
                     fetchUrl: directoryApiUrl,
-                    path: newDirPath,
-                    withParents: true,
+                    path: parentPath,
                     showFetching: false,
+                    sliceChildren: false,
                 }),
             );
             if (actionTaken.type === fetchDirectory.fulfilled.toString()) {
-                // select the new dir
-                dispatch(setSelectedByPath({ path: newDirPath, directories: actionTaken.payload }));
-
-                history.push(`?${qs.stringify({ path: newDirPath })}`);
-
                 onCreated();
             }
         }

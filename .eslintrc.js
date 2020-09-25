@@ -70,6 +70,7 @@ module.exports = {
         'no-unused-vars': 'off',
         '@typescript-eslint/no-unused-vars': 'error',
         'no-restricted-syntax': 'off',
+        'react/jsx-props-no-spreading': 'off',
     },
 
     // pass specific settings to plugins

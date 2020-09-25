@@ -6,7 +6,7 @@ import qs from 'qs';
 
 import { useHistory, useParams } from 'react-router-dom';
 import { File } from '../types/File';
-import { deleteFile, isFileSelected } from './filesSlice';
+import { deleteFile, isFileSelected } from './filesSlice/slice';
 import { RootOptions } from '../contexts';
 import AppDispatch from '../types/AppDispatch';
 import { getParentPath } from '../helpers/file';

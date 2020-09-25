@@ -9,7 +9,7 @@ import {
     selectFetchError,
     selectIsFetching,
     selectSelectedFile,
-} from './filesSlice';
+} from './filesSlice/slice';
 import FilePreview from './FilePreview';
 import useFetchAndSelectFilesFromCurrentPath from '../hooks/useFetchAndSelectFilesFromCurrentPath';
 

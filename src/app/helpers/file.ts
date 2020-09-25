@@ -30,13 +30,6 @@ export const getDirectoryOfFile = (file: File, directories: Array<Directory>): D
         <Directory>directories.find((dir) => containsFile(dir.files, file))
 );
 
-export const removeFrontDirectories = (
-    (file: File, directories: Array<Directory>): Array<Directory> => {
-        const fileDir = getDirectoryOfFile(file, directories);
-        return directories.slice(0, fileDir.depth + 1);
-    }
-);
-
 export const getDirectoryApiPath = (host: string): string => `${host}/directories`;
 
 export const getFileApiPath = (host: string): string => `${host}/files`;

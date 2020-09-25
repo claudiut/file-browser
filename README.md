@@ -12,9 +12,11 @@ Browse your files using File Manager!
 
 Set your `serverApi` prop and serve your files based on the following API URLs:
 
-- `GET [serverApi]/directories?path=/relative/dir/path&withParents=true|false` to return a directory.
+- `GET [serverApi]/directories?path=/relative/dir/path&withParents=true|false` to return a directory, and if `withParents=true` return an array of directories.
+- `POST [serverApi]/directories?path=/relative/dir/path` to create a directory at the given path
 - `DELETE [serverApi]/directories?path=/relative/dir/path` to delete a directory
 - `GET [serverApi]/files?path=/relative/file/path` to get a file
+- `POST [serverApi]/files?path=/relative/dir/path` to upload one or more files (when files are dropped into the directory). Get it from the `request.files.files` variable.
 - `DELETE [serverApi]/files?path=/relative/dir/or/file/path` to delete a file
 
 ## Stack
@@ -22,7 +24,7 @@ Built with React, Redux, TypeScript, Webpack & Eslint
 
 ## TODO
 - rename files & directories
-- add upload file functionality
+- optimizations (memoize redux selectors, don't use dispatch directly, refactor component async code, etc)
 
 ## Licence
 MIT

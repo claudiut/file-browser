@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import filesReducer from './components/filesSlice';
+import filesReducer from './components/filesSlice/slice';
 
 export default configureStore({
     reducer: { files: filesReducer },

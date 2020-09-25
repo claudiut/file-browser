@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import qs from 'qs';
 
 import AppDispatch from '../types/AppDispatch';
-import { fetchDirectory, setSelectedByPath, selectDirectories } from '../components/filesSlice';
+import { fetchDirectory, setSelectedByPath, selectDirectories } from '../components/filesSlice/slice';
 import { RootOptions } from '../contexts';
 import Directory from '../types/Directory';
 import { getDirectoryApiPath } from '../helpers/file';

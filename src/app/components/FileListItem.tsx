@@ -11,7 +11,7 @@ import FileIcon from './FileIcon';
 import { getFilename, getDirectoryApiPath } from '../helpers/file';
 import {
     isFileSelected, fetchDirectory, addSelected,
-} from './filesSlice';
+} from './filesSlice/slice';
 import { RootOptions } from '../contexts';
 import FileMenu from './FileMenu';
 
