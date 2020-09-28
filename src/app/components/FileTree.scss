@@ -1,6 +1,10 @@
 .uploader-dropzone > div {
     height: 100%;
     outline: none;
+
+    &.dragging {
+        background-color: #7fffd4;
+    }
 }
 
 .file-list {

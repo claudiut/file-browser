@@ -1,17 +1,13 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import List from '@material-ui/core/List';
-import Dropzone, { FileWithPath } from 'react-dropzone';
+import Dropzone from 'react-dropzone';
 
-import axios from 'axios';
-import { useDispatch } from 'react-redux';
 import FileListItem from './FileListItem';
 import DirectoryOptions from './DirectoryOptions';
 import DirectoryNew from './DirectoryNew';
 import Directory from '../types/Directory';
 import { File } from '../types/File';
-import { getDirectoryApiPath, getFileApiPath } from '../helpers/file';
-import { RootOptions } from '../contexts';
-import { fetchDirectory } from './filesSlice/slice';
+import useUploadDroppedFiles from '../hooks/useUploadDroppedFiles';
 
 interface FileListProps {
     directory: Directory,
@@ -25,32 +21,11 @@ const FileList = ({
     const [open, setCreateDirectoryOpen] = useState(false);
     const hideDirectoryNew = () => setCreateDirectoryOpen(false);
 
-    const { serverApi } = useContext(RootOptions);
-    const dispatch = useDispatch();
+    const onDropFiles = useUploadDroppedFiles(parentPath);
 
-    const onDropFiles = async (droppedFiles: FileWithPath[]) => {
-        const formData: FormData = new FormData();
-
-        droppedFiles.forEach((droppedFile) => {
-            formData.append('files', droppedFile, droppedFile.name);
-        });
-        formData.append('path', parentPath);
-
-        const { status } = await axios.post(getFileApiPath(serverApi), formData, {
-            // TODO: implement client + server
-            onUploadProgress: (progressEvent: ProgressEvent) => {
-                console.log(Math.round((progressEvent.loaded / progressEvent.total) * 100), '%');
-            },
-        });
-        if (status === 201) {
-            dispatch(fetchDirectory({
-                fetchUrl: getDirectoryApiPath(serverApi),
-                path: parentPath,
-                showFetching: false,
-                sliceChildren: false,
-            }));
-        }
-    };
+    const [dragging, setDragging] = useState(false);
+    const highlightUploadZone = () => setDragging(true);
+    const unhighlightUploadZone = () => setDragging(false);
 
     return (
         <div className={`file-list flex flex-column ${className}`}>
@@ -69,9 +44,15 @@ const FileList = ({
             </div>
 
             <div className="flex-auto uploader-dropzone">
-                <Dropzone onDrop={onDropFiles} noClick>
+                <Dropzone
+                    onDrop={onDropFiles}
+                    onDragEnter={highlightUploadZone}
+                    onDragLeave={unhighlightUploadZone}
+                    onDropAccepted={unhighlightUploadZone}
+                    noClick
+                >
                     {({ getRootProps, getInputProps }) => (
-                        <div {...getRootProps()}>
+                        <div {...getRootProps()} className={`${dragging ? 'dragging' : ''}`}>
                             <input {...getInputProps()} />
                             <List>
                                 {files.map(
