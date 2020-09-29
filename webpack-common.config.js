@@ -19,6 +19,10 @@ module.exports = {
                 use: 'ts-loader',
                 exclude: /node_modules/,
             },
+            {
+                test: /\.min\.css$/,
+                use: ['style-loader', 'css-loader'],
+            },
             // sass-loader turns imported .sass files into CSS
             // css-loader turns CSS imports into JS (puts it inside webpack module tree)
             // style-loader adds CSS to the DOM by injecting a <style> tag inside <head> at runtime

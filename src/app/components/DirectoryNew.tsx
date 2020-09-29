@@ -47,7 +47,7 @@ const DirectoryNew = ({ parentPath, onCreated, onCancel }: Props): JSX.Element =
     };
 
     return (
-        <form className="flex items-center ph2" onSubmit={handleCreateDirectory}>
+        <form className="flex items-center ph2 mv0" onSubmit={handleCreateDirectory}>
             {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
             <TextField
                 className="flex-auto"
@@ -56,7 +56,9 @@ const DirectoryNew = ({ parentPath, onCreated, onCancel }: Props): JSX.Element =
                 value={name}
                 onChange={({ target: { value } }) => setName(value)}
             />
-            <Button className="mh2" onClick={onCancel}>Cancel</Button>
+            <div className="mh2">
+                <Button onClick={onCancel}>Cancel</Button>
+            </div>
             <Button type="submit" variant="contained" color="primary">Create</Button>
         </form>
     );

@@ -4,7 +4,7 @@ import CreateNewFolderOutlined from '@material-ui/icons/CreateNewFolderOutlined'
 
 type Props = { onCreateDirectory: () => void };
 const DirectoryOptions = ({ onCreateDirectory }: Props): JSX.Element => (
-    <div className="flex justify-end">
+    <div className="flex justify-end pb1">
         <IconButton aria-label="create directory" title="Create Directory" onClick={onCreateDirectory}>
             <CreateNewFolderOutlined />
         </IconButton>

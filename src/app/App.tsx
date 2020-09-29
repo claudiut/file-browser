@@ -5,6 +5,8 @@ import Router from './Router';
 import store from './store';
 import { RootOptions } from './contexts';
 
+import '../lib/css/tachyons.min.css';
+
 import './App.scss';
 
 type AppPropsType = {serverApi: string};

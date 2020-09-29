@@ -135,7 +135,9 @@ const filesSlice = createSlice({
         [deleteFile.fulfilled.toString()]: (state, { meta: { arg: { file } } }) => {
             // remove obsolete/deleted selections and directories
             if (containsFile(state.selected, file)) {
-                state.selected = state.selected.filter(({ path }: File) => path !== file.path);
+                state.selected = state.selected.filter(
+                    ({ path }: File) => !path.startsWith(file.path),
+                );
 
                 const newDirs = [];
                 for (const dir of state.data) {
