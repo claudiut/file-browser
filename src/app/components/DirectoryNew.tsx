@@ -47,7 +47,7 @@ const DirectoryNew = ({ parentPath, onCreated, onCancel }: Props): JSX.Element =
     };
 
     return (
-        <form className="flex items-center ph2 mv0" onSubmit={handleCreateDirectory}>
+        <form className="flex items-center ph2" onSubmit={handleCreateDirectory}>
             {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
             <TextField
                 className="flex-auto"

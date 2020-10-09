@@ -1,6 +1,8 @@
 ## File Manager (in progress)
 Browse your files using File Manager!
 
+![Demo Animated Gif](./Demo.gif "File Manager Demo")
+
 **@Copyright and credits for UI design idea go to Apple (MacOS Finder app)!**
 
 ## Usage
@@ -23,8 +25,8 @@ Set your `serverApi` prop and serve your files based on the following API URLs:
 Built with React, Redux, TypeScript, Webpack & Eslint
 
 ## TODO
-- rename files & directories
-- optimizations (memoize redux selectors, don't use dispatch directly, refactor component async code, etc)
+- renaming of files & directories
+- code refactor and optimizations (memoize redux selectors, don't use dispatch directly, refactor component async code, etc)
 
 ## Licence
 MIT
