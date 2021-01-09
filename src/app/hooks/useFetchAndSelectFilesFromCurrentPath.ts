@@ -16,7 +16,7 @@ const useFetchAndSelectFilesFromCurrentPath = (): Array<Directory> => {
 
     useEffect(() => {
         const fetchAndSelectDirs = async () => {
-            // don't use the path as the source of truth but use the redux state
+            // ! don't use the path as the source of truth but use the redux state
             const path = (qs.parse(search.slice(1)).path || '/') as string;
 
             const actionTaken = await dispatch(
