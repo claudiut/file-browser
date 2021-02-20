@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import qs from 'qs';
 
 import AppDispatch from '../types/AppDispatch';
-import { fetchDirectory, setSelectedByPath, selectDirectories } from '../components/filesSlice/slice';
+import { fetchDirectory, selectDirectories } from '../components/filesSlice/slice';
 import { RootOptions } from '../contexts';
 import Directory from '../types/Directory';
 import { getDirectoryApiPath } from '../helpers/file';
@@ -19,14 +19,13 @@ const useFetchAndSelectFilesFromCurrentPath = (): Array<Directory> => {
             // ! don't use the path as the source of truth but use the redux state
             const path = (qs.parse(search.slice(1)).path || '/') as string;
 
-            const actionTaken = await dispatch(
+            dispatch(
                 fetchDirectory({
-                    fetchUrl: getDirectoryApiPath(serverApi), path, withParents: true,
+                    fetchUrl: getDirectoryApiPath(serverApi),
+                    path,
+                    withParents: true,
                 }),
             );
-            if (actionTaken.type === fetchDirectory.fulfilled.toString()) {
-                dispatch(setSelectedByPath({ path, directories: actionTaken.payload }));
-            }
         };
 
         fetchAndSelectDirs();
