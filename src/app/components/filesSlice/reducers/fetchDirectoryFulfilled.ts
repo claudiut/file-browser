@@ -6,18 +6,24 @@ import setSelectedByPath from './setSelectedByPath';
 
 type Action = {
     payload: Directory[]|Directory,
-    meta: { arg: { sliceChildren: boolean, path: string } }
+    meta: { arg: { sliceChildren: boolean, path: string, withParentsTopParent?: string } }
 };
 
 export default (
     (state: FilesState, action: Action): void => {
-        const { path, sliceChildren } = action.meta.arg;
+        const { path, sliceChildren, withParentsTopParent } = action.meta.arg;
         state.isFetching = false;
-
         // when receiving a list of directories
         if (Array.isArray(action.payload)) {
-            state.data = action.payload.map(alphaSortFilesOfDir);
-            setSelectedByPath(state, { payload: { path, directories: action.payload } });
+            const fetchedDirs = action.payload.map(alphaSortFilesOfDir);
+            if (withParentsTopParent) {
+                state.data = state.data.slice(0, -1 * fetchedDirs.length).concat(fetchedDirs);
+            } else {
+                // replace
+                state.data = fetchedDirs;
+            }
+
+            setSelectedByPath(state, { payload: { path, directories: state.data } });
             return;
         }
 

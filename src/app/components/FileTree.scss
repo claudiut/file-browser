@@ -10,6 +10,16 @@
 .file-list {
     border-right: 1px solid #cacaca;
 
+    min-width: 20%;
+
+    @media (max-width: 600px) {
+        min-width: 75%;
+    }
+    
+    @media only screen and (max-width: 992px) {
+        min-width: 42%;
+    }
+
     &__item-container {
         .actions {
             visibility: hidden;

@@ -26,6 +26,29 @@ export const containsFile = (files: Files, file: File): boolean => (
     files.some(({ path }) => path === file.path)
 );
 
+export const replaceFileInsideFiles = (
+    (toReplace: File, replacement: File, files: File[]): boolean => {
+        const foundIndex = files.findIndex(({ path }) => path === toReplace.path);
+        if (foundIndex !== -1) {
+            // eslint-disable-next-line no-param-reassign
+            files[foundIndex] = replacement;
+            return true;
+        }
+
+        return false;
+    }
+);
+
+export const replaceFileInsideDirectories = (
+    (toReplace: File, replacement: File, directories: Directory[]): void => {
+        for (const dir of directories) {
+            if (replaceFileInsideFiles(toReplace, replacement, dir.files)) {
+                return;
+            }
+        }
+    }
+);
+
 export const getDirectoryOfFile = (file: File, directories: Array<Directory>): Directory => (
         <Directory>directories.find((dir) => containsFile(dir.files, file))
 );

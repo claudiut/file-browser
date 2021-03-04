@@ -4,16 +4,16 @@ import { IconButton, Menu, MenuItem } from '@material-ui/core';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import qs from 'qs';
 
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { File } from '../types/File';
 import { deleteFile, isFileSelected } from './filesSlice/slice';
 import { RootOptions } from '../contexts';
 import AppDispatch from '../types/AppDispatch';
-import { getParentPath } from '../helpers/file';
+import { getFilename, getParentPath } from '../helpers/file';
 
-type FileMenuPropTypes = { file: File };
+type FileMenuPropTypes = { file: File, onRename: () => void };
 
-const FileMenu = ({ file }: FileMenuPropTypes): JSX.Element => {
+const FileMenu = ({ file, onRename }: FileMenuPropTypes): JSX.Element => {
     const { serverApi } = useContext(RootOptions);
     const dispatch: AppDispatch = useDispatch();
     const history = useHistory();
@@ -30,6 +30,11 @@ const FileMenu = ({ file }: FileMenuPropTypes): JSX.Element => {
     };
 
     const handleDelete = async () => {
+        // eslint-disable-next-line no-alert, no-restricted-globals
+        if (!confirm(`Are you sure you delete directory "${getFilename(file.path)}"?`)) {
+            return;
+        }
+
         setDeleting(true);
         const actionTaken = await dispatch(deleteFile({ file, serverApi }));
 
@@ -40,6 +45,12 @@ const FileMenu = ({ file }: FileMenuPropTypes): JSX.Element => {
         if (isSelected && actionTaken.type === deleteFile.fulfilled.toString()) {
             history.push(`?${qs.stringify({ path: getParentPath(file.path) })}`);
         }
+    };
+
+    const handleRename = () => {
+        setAnchorEl(null);
+        // pragmatic aproach to autofocus; otherwise should use a ref
+        setTimeout(onRename);
     };
 
     return (
@@ -58,6 +69,7 @@ const FileMenu = ({ file }: FileMenuPropTypes): JSX.Element => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
+                <MenuItem onClick={handleRename} disabled={deleting}>Rename</MenuItem>
                 <MenuItem onClick={handleDelete} disabled={deleting}>Delete</MenuItem>
             </Menu>
         </>

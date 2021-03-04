@@ -7,9 +7,11 @@ import setSelectedByPathReducer from './reducers/setSelectedByPath';
 import addSelectedReducer from './reducers/addSelected';
 import fetchDirectoryFulfilledReducer from './reducers/fetchDirectoryFulfilled';
 import deleteFileFulfilledReducer from './reducers/deleteFileFulfilled';
+import replaceFileReducer from './reducers/replaceFile';
 // thunks
 import fetchDirectory from './thunks/fetchDirectoryAsync';
 import deleteFile from './thunks/deleteFileAsync';
+import updateFile from './thunks/updateFileAsync';
 
 const filesSlice = createSlice({
     name: 'files',
@@ -25,6 +27,7 @@ const filesSlice = createSlice({
         removeLastSelected: (state) => {
             state.selected = state.selected.slice(0, -1);
         },
+        replaceFile: replaceFileReducer,
     },
     extraReducers: {
         [fetchDirectory.pending.toString()]: (
@@ -48,7 +51,12 @@ const filesSlice = createSlice({
 // reducers
 export default filesSlice.reducer;
 // actions
-export const { setSelectedByPath, addSelected, removeLastSelected } = filesSlice.actions;
-export { fetchDirectory, deleteFile };
+export const {
+    setSelectedByPath,
+    addSelected,
+    removeLastSelected,
+    replaceFile,
+} = filesSlice.actions;
+export { fetchDirectory, deleteFile, updateFile };
 // selectors
 export * from './selectors';

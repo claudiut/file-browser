@@ -53,7 +53,7 @@ module.exports = {
         ],
     },
     plugins: [
-        new CleanWebpackPlugin(),
+        // new CleanWebpackPlugin(),
     ],
     // configures how webpack resolves modules
     resolve: {
