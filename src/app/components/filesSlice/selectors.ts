@@ -9,7 +9,7 @@ export const isFileSelected = (file: File) => (state: AppState): boolean => (
     containsFile(state.files.selected, file)
 );
 
-export const selectSelectedFile = (state: AppState): File | null => (
+export const selectLatestSelectedFile = (state: AppState): File | null => (
     state.files.selected[state.files.selected.length - 1] || null
 );
 export const selectFetchError = (state: AppState): Error | null => state.files.fetchError;

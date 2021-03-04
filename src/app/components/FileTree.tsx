@@ -8,18 +8,18 @@ import './FileTree.scss';
 import {
     selectFetchError,
     selectIsFetching,
-    selectSelectedFile,
+    selectLatestSelectedFile,
 } from './filesSlice/slice';
 import FilePreview from './FilePreview';
 import useFetchAndSelectFilesFromCurrentPath from '../hooks/useFetchAndSelectFilesFromCurrentPath';
 
 const FileTree = (): JSX.Element | null => {
     const directories = useFetchAndSelectFilesFromCurrentPath();
-    const selectedFile = useSelector(selectSelectedFile);
+    const latestSelectedFile = useSelector(selectLatestSelectedFile);
     const isFetching = useSelector(selectIsFetching);
     const fetchError = useSelector(selectFetchError);
 
-    const isFetchingDir = isFetching && (!selectedFile || selectedFile.isDir);
+    const isFetchingDir = isFetching && (!latestSelectedFile || latestSelectedFile.isDir);
     const listContainerClasses = 'h-100 w-100 overflow-y-auto';
 
     return (
@@ -31,9 +31,9 @@ const FileTree = (): JSX.Element | null => {
             {
                 isFetchingDir
                     ? <div className={listContainerClasses} />
-                    : selectedFile && !selectedFile.isDir && (
+                    : latestSelectedFile && !latestSelectedFile.isDir && (
                         <div className={listContainerClasses}>
-                            <FilePreview file={selectedFile} />
+                            <FilePreview file={latestSelectedFile} />
                         </div>
                     )
             }

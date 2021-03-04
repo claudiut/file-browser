@@ -31,8 +31,7 @@ const FileListItem = ({ file, handleClick, selected }: Props): JSX.Element => {
 
     const handleEditName = (newName: string) => {
         const sep = '/';
-        const pathParts = file.path.split(sep);
-        const newPath = pathParts.slice(0, -1).join(sep) + sep + newName;
+        const newPath = file.path.split(sep).slice(0, -1).join(sep) + sep + newName;
         dispatch(
             updateFile({
                 file,
