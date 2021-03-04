@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import List from '@material-ui/core/List';
+import React, { memo, useState } from 'react';
+import MuiList from '@material-ui/core/List';
 import Dropzone from 'react-dropzone';
 
 import FileListItem from './FileListItem';
@@ -8,6 +8,17 @@ import DirectoryNew from './DirectoryNew';
 import Directory from '../types/Directory';
 import { File } from '../types/File';
 import useUploadDroppedFiles from '../hooks/useUploadDroppedFiles';
+
+interface ListProps { files: File[] }
+const List = memo(
+    ({ files }: ListProps): JSX.Element => (
+        <MuiList>
+            {files.map(
+                (file: File) => <FileListItem key={file.path} file={file} />,
+            )}
+        </MuiList>
+    ),
+);
 
 interface FileListProps {
     directory: Directory,
@@ -54,11 +65,7 @@ const FileList = ({
                     {({ getRootProps, getInputProps }) => (
                         <div {...getRootProps()} className={`${dragging ? 'dragging' : ''}`}>
                             <input {...getInputProps()} />
-                            <List>
-                                {files.map(
-                                    (file: File) => <FileListItem key={file.path} file={file} />,
-                                )}
-                            </List>
+                            <List files={files} />
                         </div>
                     )}
                 </Dropzone>
