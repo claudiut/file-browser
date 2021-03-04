@@ -5,6 +5,7 @@ import { File } from '../../types/File';
 
 export const selectDirectories = (state: AppState): Array<Directory> => state.files.data;
 
+// TODO: optimize - don't use inside highly-repeated components, find another solution
 export const isFileSelected = (file: File) => (state: AppState): boolean => (
     containsFile(state.files.selected, file)
 );

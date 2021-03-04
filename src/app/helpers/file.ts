@@ -1,12 +1,13 @@
 import sortBy from 'lodash/sortBy';
+import memoize from 'memoizee';
 
 import { File, Files } from '../types/File';
 import Directory from '../types/Directory';
 
-export const getFilename = (path: string): string => {
+export const getFilename = memoize((path: string): string => {
     const parts = path.split('/');
     return parts[parts.length - 1];
-};
+});
 
 export const getSelectedFile = (files: Files, path: string): File | undefined => (
     files.find((file: File) => file.path === path || path.indexOf(`${file.path}/`) === 0)
