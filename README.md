@@ -26,7 +26,7 @@ Built with React, Redux, TypeScript, Webpack & Eslint
 
 ## TODO
 - renaming of files & directories
-- code refactor and optimizations (memoize redux selectors, don't use dispatch directly, refactor component async code, etc)
+- code refactor and optimizations
 
 ## Licence
 MIT
